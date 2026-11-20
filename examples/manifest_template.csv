@@ -1,0 +1,2 @@
+﻿sample_id,group,sex,locus,hifi_bam,fail_bams,hifi_raw_bams,note
+SAMPLE_01,positive,F,DMPK,/path/to/SAMPLE_01.hiphase.haplotagged.bam,auto,-,"예시 행 — 지우고 쓰세요 / example row, overwrite it"

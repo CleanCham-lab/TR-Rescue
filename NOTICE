@@ -1,0 +1,9 @@
+TR-Rescue
+Copyright (c) 2026 Seung Won Chae — MIT License (see LICENSE)
+
+This software embeds a snapshot (2026-11-17) of the STRchive disease tandem-repeat locus catalogue
+(data/strchive_hg38.tsv, derived from data/STRchive-loci.json at https://github.com/dashnowlab/STRchive).
+STRchive by Harriet Dashnow and contributors is licensed under CC BY 4.0
+(https://creativecommons.org/licenses/by/4.0/). Fields were selected and reformatted to TSV; values unchanged.
+Citation: Hiatt L, et al. STRchive: a dynamic resource detailing population-level and locus-specific insights at
+tandem repeat disease loci. Genome Medicine (2025). doi:10.1186/s13073-025-01454-4

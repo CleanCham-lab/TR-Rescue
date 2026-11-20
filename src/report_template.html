@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TR-Rescue 결과</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,__FAVICON__">
+<style>
+:root{--surface:#ffffff;--page:#f6f6f4;--side:#efefec;--ink:#111110;--ink2:#52514e;--muted:#8a8984;--grid:#e3e2dc;--axis:#c3c2b7;
+--accent:#1b4969;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--good:#0ca30c;--warn:#d99a00;--serious:#ec835a;--crit:#d03b3b;
+--zone-n:rgba(12,163,12,.07);--zone-i:rgba(250,178,25,.12);--zone-p:rgba(208,59,59,.08);--sel:#e6eef6}
+@media (prefers-color-scheme: dark){:root{--surface:#1b1b1a;--page:#111110;--side:#161615;--ink:#f0efec;--ink2:#c3c2b7;--muted:#898781;
+--grid:#2c2c2a;--axis:#3a3a37;--accent:#7fb2dc;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--zone-n:rgba(12,163,12,.10);--zone-i:rgba(250,178,25,.12);--zone-p:rgba(208,59,59,.14);--sel:#24303a}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--page);color:var(--ink);font:14px/1.55 system-ui,-apple-system,"Segoe UI","Noto Sans KR","Malgun Gothic",sans-serif}
+a{color:var(--accent)}
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);height:100vh}
+.side{background:var(--side);border-right:1px solid var(--grid);display:flex;flex-direction:column;padding:16px 12px;gap:14px;overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 6px}
+.logo{width:40px;height:40px;border-radius:10px;object-fit:cover;background:#fff;box-shadow:0 0 0 1px var(--grid);cursor:pointer;user-select:none}
+.banner{display:block;width:100%;height:auto;border-radius:12px;margin:2px 0 14px;box-shadow:0 0 0 1px var(--grid)}
+.egg{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;place-items:center;z-index:50;cursor:pointer}
+.egg.on{display:grid}.egg img{max-width:min(92vw,1100px);height:auto;border-radius:14px;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.egg p{color:#fff;text-align:center;margin:10px 0 0;font-size:13px}
+.brand b{display:block;font-size:16px;white-space:nowrap}.brand span{color:var(--muted);font-size:12px}
+.lang{align-self:flex-start;margin:-6px 0 0 56px;display:flex;border:1px solid var(--axis);border-radius:7px;overflow:hidden}
+.lang button{font:inherit;font-size:11.5px;padding:3px 7px;border:0;background:var(--surface);color:var(--ink2);cursor:pointer}
+.lang button.on{background:var(--accent);color:#fff}
+nav{display:flex;flex-direction:column;gap:2px}
+nav a{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:var(--ink);text-decoration:none;cursor:pointer;font-size:14px}
+nav a:hover{background:rgba(127,127,127,.12)}
+nav a.on{background:var(--surface);box-shadow:0 0 0 1px var(--grid);font-weight:600}
+nav a i{font-style:normal;width:18px;text-align:center;color:var(--ink2)}
+.status{background:var(--surface);border:1px solid var(--grid);border-radius:10px;padding:10px 12px}
+.status h4{margin:0 0 6px;font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.3px}
+.st-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:13px}
+.st-row b{font-variant-numeric:tabular-nums}
+.st-row.click{cursor:pointer;border-radius:6px;margin:0 -6px;padding:3px 6px}.st-row.click:hover{background:rgba(127,127,127,.1)}
+.side-foot{margin-top:auto;font-size:11.5px;color:var(--muted);padding:0 6px}
+main{overflow:auto;padding:22px 28px 60px}
+section{display:none}section.on{display:block}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:26px 0 10px}h3{font-size:15px;margin:0 0 8px}
+.sub{color:var(--ink2);margin:0 0 16px}
+.card{background:var(--surface);border:1px solid var(--grid);border-radius:12px;padding:14px 16px;margin:0 0 14px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.note{color:var(--ink2);font-size:12.5px}
+.badge{display:inline-block;padding:1px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;border:1px solid transparent}
+.lv-high{background:rgba(208,59,59,.12);color:var(--crit);border-color:rgba(208,59,59,.35)}
+.lv-watch{background:rgba(250,178,25,.16);color:#a06f00;border-color:rgba(250,178,25,.45)}
+.lv-info{background:rgba(42,120,214,.10);color:var(--s1);border-color:rgba(42,120,214,.3)}
+.lv-ok{background:rgba(127,127,127,.10);color:var(--ink2);border-color:var(--grid)}
+@media (prefers-color-scheme: dark){.lv-watch{color:#f2c14e}}
+.rg-pathogenic{color:var(--crit);font-weight:600}.rg-intermediate{color:#a06f00;font-weight:600}.rg-benign_motif{color:var(--s1)}.rg-normal{color:var(--ink2)}
+.role{font-size:11px;padding:0 6px;border-radius:4px;border:1px solid var(--axis);margin-right:4px;white-space:nowrap;display:inline-block}
+.role-positive{border-color:var(--accent);color:var(--accent)}
+.qc{color:#c2410c;font-weight:600}
+.path{border-bottom:1px dotted var(--muted,#888);cursor:copy}
+.path.copied{background:var(--accent);color:#fff}
+.exp-tag{font-size:11px;padding:0 6px;border-radius:4px;background:var(--accent);color:#fff;margin-left:6px;white-space:nowrap;display:inline-block}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{border-bottom:1px solid var(--grid);padding:6px 8px;text-align:left;vertical-align:top}
+th{color:var(--ink2);font-weight:600;background:var(--surface);position:sticky;top:0;z-index:1;white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tbody tr.row{cursor:pointer}tbody tr.row:hover{background:var(--sel)}
+.filters{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:0 0 12px}
+.filters label{font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:6px}
+select,input[type=search]{font:inherit;font-size:13px;padding:5px 8px;border:1px solid var(--axis);border-radius:7px;background:var(--surface);color:var(--ink)}
+input[type=search]{min-width:200px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--axis);border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer;user-select:none;background:var(--surface)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.count{color:var(--muted);font-size:12.5px;margin-left:auto}
+.tablewrap{overflow:auto;max-height:calc(100vh - 220px);border:1px solid var(--grid);border-radius:10px;background:var(--surface)}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:12px}
+.btn{font:inherit;font-size:13px;padding:5px 12px;border:1px solid var(--axis);border-radius:7px;background:var(--surface);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.lochead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin:2px 0 12px}
+.lochead .title{font-size:20px;font-weight:700}
+.links a{margin-right:10px;font-size:13px}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:13px}.kv dt{color:var(--muted)}.kv dd{margin:0}
+.help{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;border:1px solid var(--axis);color:var(--ink2);font-size:11px;cursor:pointer;margin-left:6px;vertical-align:middle}
+.helpbox{display:none;background:var(--page);border:1px solid var(--grid);border-radius:8px;padding:8px 10px;font-size:12.5px;color:var(--ink2);margin:6px 0 10px}
+.helpbox.on{display:block}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink2);margin:2px 0 6px}
+.legend i{display:inline-block;width:18px;height:0;border-top:2px solid;vertical-align:middle;margin-right:5px}
+.legend i.d{border-top-style:dashed}.legend i.o{border-top-style:dotted}
+.legend b{display:inline-block;width:9px;height:9px;border-radius:50%;vertical-align:middle;margin-right:5px}
+svg text{fill:var(--ink2);font-size:11px;font-family:inherit}
+.tip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--axis);border-radius:8px;padding:7px 9px;font-size:12px;box-shadow:0 4px 18px rgba(0,0,0,.12);z-index:50;display:none;max-width:340px}
+.tip b{font-weight:600}
+ul.hints{margin:6px 0 0;padding-left:18px}
+details summary{cursor:pointer;color:var(--ink2)}
+.ov{max-width:1800px;margin:0 auto}
+.ov > p{max-width:980px}
+.ov h2{margin-top:22px}
+.ov dl{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px}
+.hero{display:grid;grid-template-columns:minmax(0,1100px) minmax(300px,1fr);gap:14px;align-items:stretch;margin:2px 0 14px}
+.hero .banner{margin:0;height:100%;object-fit:cover}
+.hero-side{display:flex;flex-direction:column;gap:14px}.hero-side .card{margin:0;flex:1}
+.glance{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:13.5px}
+.glance a{display:contents;color:inherit;text-decoration:none;cursor:pointer}
+.glance a > *{padding:5px 6px;border-radius:6px}.glance a:hover > *{background:rgba(127,127,127,.1)}
+.glance b{text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width: 1500px){.hero{grid-template-columns:1fr}.hero-side{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}}
+.ov dt{font-weight:600}.ov dd{margin:0;color:var(--ink2)}
+.empty{color:var(--muted);padding:12px}
+code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;background:rgba(127,127,127,.12);padding:1px 4px;border-radius:4px}
+@media (max-width: 860px){
+ .app{grid-template-columns:1fr;grid-template-rows:auto 1fr;height:auto;min-height:100vh}
+ .side{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:10px 12px;border-right:0;border-bottom:1px solid var(--grid);position:sticky;top:0;z-index:5}
+ nav{flex-direction:row;flex-wrap:wrap}
+ .lang{margin:0;align-self:center}
+ .status{display:flex;gap:12px;padding:6px 10px}.status h4{display:none}.st-row{gap:6px}
+ .side-foot{display:none}
+ main{padding:16px 14px 50px;overflow:visible}
+ .tablewrap{max-height:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="brand"><img class="logo" id="logo" alt="TR-Rescue" title="TR-Rescue" src="data:image/webp;base64,__ICON__"><div><b>TR-Rescue</b><span id="ver"></span></div></div>
+  <div class="lang" role="group" aria-label="Language"><button type="button" data-lang="ko">KR</button><button type="button" data-lang="en">EN</button></div>
+  <nav id="nav">
+    <a data-tab="overview"><i>ⓘ</i><span data-t="개요|Overview"></span></a>
+    <a data-tab="summary"><i>☰</i><span data-t="요약|Summary"></span></a>
+    <a data-tab="analysis"><i>◔</i><span data-t="분석|Analysis"></span></a>
+    <a data-tab="loci"><i>⌖</i><span data-t="좌위 정보|Loci"></span></a>
+    <a data-tab="run"><i>⚙</i><span data-t="실행 정보|Run"></span></a>
+  </nav>
+  <div class="status" id="status"></div>
+  <div class="side-foot">© 2026 Seung Won Chae · MIT<br><span data-t="좌위 정보|Locus data">좌위 정보</span>: STRchive (CC BY 4.0)<br><span data-t="연구용 — 진단 결과 아님|Research use — not a diagnosis"></span></div>
+</aside>
+<main>
+<section id="tab-overview" class="ov"></section>
+<section id="tab-summary">
+  <h1 data-t="요약|Summary"></h1>
+  <p class="sub" data-t="샘플 × 좌위 한 줄씩. 행을 누르면 분석 화면으로 갑니다.|One row per sample × locus. Click a row to open it in Analysis."></p>
+  <div class="filters">
+    <label><span data-t="샘플|Sample"></span> <select id="f-sample"></select></label>
+    <label><span data-t="역할|Role"></span> <select id="f-group"></select></label>
+    <label><span data-t="좌위|Locus"></span> <input type="search" id="f-locus" data-tp="유전자 · 질환 · ID|gene · disease · ID"></label>
+    <div class="chips" id="f-level"></div>
+    <label data-tt="manifest의 locus 열에 적은 기존 진단 좌위 (도구 판정이 아님)|Known-diagnosis loci from the manifest's locus column (not a call by this tool)"><input type="checkbox" id="f-expected"> <span data-t="기존 진단 좌위만|Known diagnosis only"></span></label>
+    <label data-tt="기존 진단 좌위인데 HiFi에서 병적/중간 범위 allele이 안 잡혔고 판정도 '확인 필요'가 아닌 행|Known-diagnosis loci where HiFi shows no pathogenic/intermediate allele and the call is not 'Review'"><input type="checkbox" id="f-missed"> <span data-t="재현 안 된 것만|Not reproduced only"></span></label>
+    <span class="count" id="f-count"></span>
+  </div>
+  <div class="tablewrap"><table id="sum-table"><thead><tr>
+    <th data-t="샘플|Sample"></th><th data-t="좌위|Locus"></th><th data-t="판정|Call"></th><th data-t="HiFi allele (반복 횟수)|HiFi alleles (repeat units)"></th><th data-t="범위|Range"></th><th data-t="확장 근거 (read 수)|Expansion evidence (reads)"></th><th class="num">depth f</th><th data-t="참고|Notes"></th>
+  </tr></thead><tbody></tbody></table></div>
+</section>
+<section id="tab-analysis">
+  <div class="toolbar">
+    <label><span data-t="샘플|Sample"></span> <select id="a-sample"></select></label>
+    <label><span data-t="좌위|Locus"></span> <select id="a-locus"></select></label>
+    <button class="btn" id="a-prev" data-t="◀ 이전|◀ Prev"></button><button class="btn" id="a-next" data-t="다음 ▶|Next ▶"></button>
+    <label class="note"><input type="checkbox" id="a-flag"> <span data-t="이전/다음은 판정 있는 좌위만|Prev/Next only through flagged loci"></span></label>
+  </div>
+  <div id="a-body"></div>
+</section>
+<section id="tab-loci">
+  <h1 data-t="좌위 정보|Loci"></h1>
+  <p class="sub" data-t="분석한 좌위 목록과 기준값. 좌표·motif·정상/병적 범위·유전 형태는 STRchive 값입니다. STRchive 구간이 임상 반복 수와 다른 좌위(AR, FRAXE, ATXN8OS)는 '반복 수 보정'으로 표시했고, 그 밖에 참조 서열상 구간 가장자리에 반복이 아닌 서열이 있는 좌위는 ⚠로 표시했습니다. 질환 표현형과 문헌은 각 링크에서 확인하세요.|Analysed loci and thresholds. Coordinates, motifs, normal/pathogenic ranges and inheritance are STRchive values. Loci whose STRchive region differs from the clinical repeat count (AR, FRAXE, ATXN8OS) are marked 'count corrected'; other loci whose reference region has non-repeat sequence at its edges are marked ⚠. See the links for phenotypes and literature."></p>
+  <div class="filters"><label><span data-t="검색|Search"></span> <input type="search" id="l-search" data-tp="유전자 · 질환 · ID|gene · disease · ID"></label><span class="count" id="l-count"></span></div>
+  <div class="tablewrap"><table id="loci-table"><thead><tr>
+    <th>ID</th><th data-t="유전자|Gene"></th><th data-t="질환|Disease"></th><th data-t="유전|Inheritance"></th><th data-t="근거|Evidence"></th><th data-t="구간 (hg38)|Region (hg38)"></th><th>motif</th><th class="num" data-t="정상 ≤|Normal ≤"></th><th class="num" data-t="병적 ≥|Pathogenic ≥"></th><th class="num" data-t="유일 flank L/R|Unique flank L/R"></th><th data-t="링크|Links"></th>
+  </tr></thead><tbody></tbody></table></div>
+</section>
+<section id="tab-run"></section>
+</main>
+</div>
+<div class="tip" id="tip"></div>
+<div class="egg" id="egg" role="dialog" aria-label="repeat expansion"><div><img alt="Repeat Expansion!?" src="data:image/webp;base64,__EGG__"><p data-t="repeat expansion!? · 아무 곳이나 누르면 닫힙니다|repeat expansion!? · click anywhere to close"></p></div></div>
+<script id="data" type="application/json">__TR_RESCUE_DATA__</script>
+<script>
+"use strict";
+const D = JSON.parse(document.getElementById('data').textContent);
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = (v, d=2) => (v === null || v === undefined || !isFinite(v)) ? 'NA' : Number(v).toFixed(d);
+const R = {}; D.results.forEach(r => R[r.s + ':' + r.l] = r);
+
+// ---------------------------------------------------------------- language
+let LANG = (() => { try { const v = localStorage.getItem('trr-lang'); if (v === 'ko' || v === 'en') return v; } catch (e) {} return D.meta.lang === 'en' ? 'en' : 'ko'; })();
+const EN = () => LANG === 'en';
+const t = (ko, en) => EN() ? en : ko;
+// bilingual value from the data: {ko, en} or a plain string
+const tx = o => (o && typeof o === 'object' && !Array.isArray(o)) ? (EN() ? (o.en ?? o.ko) : (o.ko ?? o.en)) : (o ?? '');
+const pick = m => k => { const v = m[k]; return v ? (EN() ? v[1] : v[0]) : k; };
+const LEVEL = pick({high:['확인 필요','Review'], watch:['관찰','Watch'], info:['참고','Note'], ok:['이상 없음','No finding']});
+const RANGE = k => k === 'NA' || !k ? '—' : pick({pathogenic:['병적 범위','pathogenic'], intermediate:['중간 범위','intermediate'], benign_motif:['양성 motif','benign motif'], normal:['정상','normal']})(k);
+const SRC = pick({hifi_aligned:['HiFi (정렬)','HiFi (aligned)'], hifi_not_in_aln:['HiFi (정렬본에 없음)','HiFi (not in aligned BAM)'], fail_subread:['fail 0x08 subread','fail 0x08 subread'], fail_lowqv:['fail 0x01 (QV<20)','fail 0x01 (QV<20)'], fail_other:['fail 기타','fail other'], unassigned_hifi:['unassigned HiFi','unassigned HiFi'], unassigned_fail:['unassigned fail','unassigned fail']});
+const GROUPS = ['hifi_aligned', 'hifi_not_in_aln', 'fail_subread', 'fail_lowqv', 'fail_other', 'unassigned_hifi', 'unassigned_fail'];
+const STATE = pick({NORMAL:['정상','normal'], CONTRACTED:['축소 (병적)','contracted (pathogenic)'], INTERMEDIATE:['중간','intermediate'], INTERMEDIATE_LB:['중간 (하한)','intermediate (lower bound)'], EXPANDED:['확장','expanded'], EXPANDED_LB:['확장 (하한)','expanded (lower bound)'], BENIGN_MOTIF:['양성 motif','benign motif'], NONREPEAT:['비반복 삽입','non-repeat insert'], UNRESOLVED:['미결정','unresolved'], FLANK_ONLY:['flank만','flank only'], AMBIGUOUS:['모호','ambiguous']});
+const BOUND = pick({exact:['정확','exact'], lower_bound:['하한','lower bound'], estimate:['추정','estimate']});
+const srcGroup = s => (GROUPS.includes(s) ? s : (s.startsWith('fail') ? 'fail_other' : s));
+const ROLE = pick({positive:['양성','positive'], control:['대조','control'], test:['검사','test']});
+const SEX = pick({M:['남','M'], F:['여','F']});
+const roleTag = S => `<span class="role role-${S.role}" title="group: ${esc(S.group)}">${ROLE(S.role)}</span>`;
+const sexText = S => S.sex ? SEX(S.sex) : (S.sex_inferred ? SEX(S.sex_inferred) + t('(추정)', ' (inferred)') : t('성별 ?', 'sex ?'));
+const qcList = S => (S.qc || []).map(tx);
+const qcMark = S => S.qc && S.qc.length ? ` <span class="qc" title="${esc(qcList(S).join('\n'))}">⚠</span>` : '';
+const uOf = (L, bp) => (bp - (L.offset || 0)) / L.unit;
+const U = t('회', '');
+const reproduced = r => ['pathogenic', 'intermediate'].includes(r.alleles.range) || r.level === 'high';
+const lv = l => `<span class="badge lv-${l}">${LEVEL(l)}</span>`;
+const locName = L => `${esc(L.gene)} <span class="note">${esc(L.disease_id || L.id)}</span>`;
+const EXP_TITLE = () => t('manifest의 locus 열에 적은 기존 진단 좌위 (도구 판정이 아님)', "Known-diagnosis locus from the manifest's locus column (not a call by this tool)");
+
+function applyStatic() {
+  document.documentElement.lang = LANG;
+  document.querySelectorAll('[data-t]').forEach(e => { const [k, n] = e.dataset.t.split('|'); e.textContent = EN() ? n : k; });
+  document.querySelectorAll('[data-tp]').forEach(e => { const [k, n] = e.dataset.tp.split('|'); e.placeholder = EN() ? n : k; });
+  document.querySelectorAll('[data-tt]').forEach(e => { const [k, n] = e.dataset.tt.split('|'); e.title = EN() ? n : k; });
+  document.querySelectorAll('.lang button').forEach(b => b.classList.toggle('on', b.dataset.lang === LANG));
+  document.title = t('TR-Rescue 결과', 'TR-Rescue results');
+}
+function setLang(l) {
+  LANG = l; try { localStorage.setItem('trr-lang', l); } catch (e) {}
+  const keep = {fs: $('#f-sample').value, fg: $('#f-group').value};
+  applyStatic(); renderStatus(); initFilters(); $('#f-sample').value = keep.fs; $('#f-group').value = keep.fg;
+  renderSummary(); initAnalysis(); renderLoci(); renderRun(); renderOverview();
+  if ($('#tab-analysis').classList.contains('on')) renderAnalysis();
+}
+document.querySelectorAll('.lang button').forEach(b => b.onclick = () => setLang(b.dataset.lang));
+
+// ---------------------------------------------------------------- navigation
+let current = {s: 0, l: 0};
+const TABS = ['overview', 'summary', 'analysis', 'loci', 'run'];
+let shownTab = null;
+// Every view has its own address (#summary, #analysis/<sample>/<locus> …), so the browser's back / forward
+// buttons (and mouse side buttons) move between views and between loci.
+function hashFor(tab) {
+  if (tab !== 'analysis' || !D.samples[current.s] || !D.loci[current.l]) return '#' + tab;
+  return '#analysis/' + encodeURIComponent(D.samples[current.s].id) + '/' + encodeURIComponent(D.loci[current.l].id);
+}
+function render(tab) {
+  document.querySelectorAll('section').forEach(x => x.classList.toggle('on', x.id === 'tab-' + tab));
+  document.querySelectorAll('#nav a').forEach(x => x.classList.toggle('on', x.dataset.tab === tab));
+  if (tab === 'analysis') renderAnalysis();
+  if (tab !== shownTab) $('main').scrollTop = 0;
+  shownTab = tab;
+}
+function go(tab) { const h = hashFor(tab); if (location.hash === h) render(tab); else location.hash = h; }
+const show = go;
+function route() {
+  const parts = location.hash.slice(1).split('/').map(x => { try { return decodeURIComponent(x); } catch (e) { return x; } });
+  const tab = TABS.includes(parts[0]) ? parts[0] : 'overview';
+  if (tab === 'analysis' && parts.length >= 3) {
+    const si = D.samples.findIndex(s => s.id === parts[1]), li = D.loci.findIndex(l => l.id === parts[2]);
+    if (si >= 0) current.s = si;
+    if (li >= 0) current.l = li;
+  }
+  render(tab);
+}
+addEventListener('hashchange', route);
+document.querySelectorAll('#nav a').forEach(a => a.onclick = () => go(a.dataset.tab));
+$('#ver').textContent = 'v' + D.meta.version;
+
+// ---------------------------------------------------------------- status
+function renderStatus() {
+  const n = {high:0, watch:0, info:0, ok:0};
+  D.results.forEach(r => n[r.level]++);
+  const exp = D.results.filter(r => r.expected);
+  const found = exp.filter(reproduced);
+  const warned = D.samples.filter(s => s.qc && s.qc.length);
+  $('#status').innerHTML = `<h4>${t('상태', 'Status')}</h4>
+    <div class="st-row"><span>${t('샘플', 'Samples')}</span><b>${D.samples.length}</b></div>
+    <div class="st-row"><span>${t('좌위', 'Loci')}</span><b>${D.loci.length}</b></div>
+    <div class="st-row click" data-lv="high"><span>${lv('high')}</span><b>${n.high}</b></div>
+    <div class="st-row click" data-lv="watch"><span>${lv('watch')}</span><b>${n.watch}</b></div>
+    <div class="st-row click" data-lv="info"><span>${lv('info')}</span><b>${n.info}</b></div>
+    <div class="st-row click" data-missed="1" title="${esc(t("manifest locus 열의 기존 진단 좌위 중 HiFi에서 병적/중간 범위 allele이 잡혔거나 '확인 필요'로 판정된 비율. 누르면 재현 안 된 행만 봅니다.", "Share of known-diagnosis loci (manifest locus column) where HiFi shows a pathogenic/intermediate allele or the call is 'Review'. Click to list the ones not reproduced."))}"><span>${t('기존 진단 재현', 'Known dx reproduced')}</span><b>${found.length}/${exp.length}</b></div>
+    ${warned.length ? `<div class="st-row" title="${esc(warned.map(s => s.id + ': ' + qcList(s).join('; ')).join('\n'))}"><span class="qc">⚠ ${t('샘플 경고', 'Sample warnings')}</span><b>${warned.length}</b></div>` : ''}
+    <div class="st-row"><span class="note">${t('생성', 'Created')}</span><span class="note">${esc(D.meta.created)}</span></div>`;
+  document.querySelectorAll('.st-row.click').forEach(e => e.onclick = () => {
+    if (e.dataset.missed) { levelSel = new Set(['high','watch','info','ok']); $('#f-expected').checked = true; $('#f-missed').checked = true; }
+    else { levelSel = new Set([e.dataset.lv]); $('#f-missed').checked = false; }
+    syncChips(); renderSummary(); show('summary'); });
+}
+
+// ---------------------------------------------------------------- summary
+let levelSel = new Set(['high', 'watch']);
+function initFilters() {
+  $('#f-sample').innerHTML = `<option value="">${t('전체', 'All')}</option>` + D.samples.map((s, i) => `<option value="${i}">${esc(s.id)}</option>`).join('');
+  const roles = ['positive', 'control', 'test'].filter(k => D.samples.some(s => s.role === k));
+  const groups = [...new Set(D.samples.map(s => s.group))].filter(g => g && g !== '-');
+  $('#f-group').innerHTML = `<option value="">${t('전체', 'All')}</option>` + roles.map(k => `<option value="r:${k}">${ROLE(k)} (${D.samples.filter(s => s.role === k).length})</option>`).join('')
+    + (groups.length > 1 || (groups.length === 1 && roles.length > 1) ? `<optgroup label="${t('manifest group 값', 'manifest group values')}">` + groups.map(g => `<option value="g:${esc(g)}">${esc(g)}</option>`).join('') + '</optgroup>' : '');
+  $('#f-level').innerHTML = ['high','watch','info','ok'].map(k => `<span class="chip" data-k="${k}">${LEVEL(k)}</span>`).join('');
+  document.querySelectorAll('#f-level .chip').forEach(c => c.onclick = () => {
+    levelSel.has(c.dataset.k) ? levelSel.delete(c.dataset.k) : levelSel.add(c.dataset.k); syncChips(); renderSummary(); });
+  ['#f-sample','#f-group'].forEach(id => $(id).onchange = renderSummary);
+  // 'known diagnosis only' / 'not reproduced only' turn every level on so known loci with no finding are not hidden
+  $('#f-expected').onchange = () => { if ($('#f-expected').checked) { levelSel = new Set(['high','watch','info','ok']); syncChips(); } else $('#f-missed').checked = false; renderSummary(); };
+  $('#f-missed').onchange = () => { if ($('#f-missed').checked) { $('#f-expected').checked = true; levelSel = new Set(['high','watch','info','ok']); syncChips(); } renderSummary(); };
+  $('#f-locus').oninput = renderSummary;
+  syncChips();
+}
+function syncChips() { document.querySelectorAll('#f-level .chip').forEach(c => c.classList.toggle('on', levelSel.has(c.dataset.k))); }
+function rowsFiltered() {
+  const fs = $('#f-sample').value, fg = $('#f-group').value, q = $('#f-locus').value.trim().toLowerCase(), fe = $('#f-expected').checked;
+  return D.results.filter(r => {
+    const S = D.samples[r.s], L = D.loci[r.l];
+    if (fs !== '' && r.s != fs) return false;
+    if (fg && !(fg === 'r:' + S.role || fg === 'g:' + S.group)) return false;
+    if (fe && !r.expected) return false;
+    if ($('#f-missed').checked && (!r.expected || reproduced(r))) return false;
+    if (!levelSel.has(r.level)) return false;
+    if (q && !(L.gene + ' ' + L.id + ' ' + L.disease + ' ' + L.disease_id).toLowerCase().includes(q)) return false;
+    return true;
+  }).sort((a, b) => a.s - b.s || ({high:0,watch:1,info:2,ok:3}[a.level] - {high:0,watch:1,info:2,ok:3}[b.level]) || (b.expected - a.expected) || a.l - b.l);
+}
+function renderSummary() {
+  const rows = rowsFiltered();
+  $('#f-count').textContent = `${rows.length} / ${D.results.length} ${t('행', 'rows')}`;
+  $('#sum-table tbody').innerHTML = rows.map(r => {
+    const S = D.samples[r.s], L = D.loci[r.l], c = r.canyon;
+    const f = c && c.f !== null ? `${fmt(c.f)}<span class="note">±${fmt(c.se)}</span>` : 'NA';
+    return `<tr class="row" data-s="${r.s}" data-l="${r.l}">
+      <td>${esc(S.id)}${qcMark(S)}<div class="note" style="white-space:nowrap">${roleTag(S)}${sexText(S)}</div></td>
+      <td>${locName(L)}${r.expected ? `<span class="exp-tag" title="${esc(EXP_TITLE())}">${t('기존 진단', 'Known dx')}</span>` : ''}</td>
+      <td>${lv(r.level)}</td>
+      <td>${esc(tx(r.allele_text))}</td>
+      <td class="rg-${r.alleles.range}">${RANGE(r.alleles.range)}</td>
+      <td class="note">${esc(tx(r.evidence))}</td>
+      <td class="num">${f}</td>
+      <td class="note">${esc(r.hints.map(tx).join(' · ') || '—')}</td></tr>`;
+  }).join('') || `<tr><td colspan="8" class="empty">${t('조건에 맞는 행이 없습니다.', 'No rows match the filters.')}</td></tr>`;
+  document.querySelectorAll('#sum-table tr.row').forEach(tr => tr.onclick = () => { current = {s: +tr.dataset.s, l: +tr.dataset.l}; show('analysis'); });
+}
+
+// ---------------------------------------------------------------- analysis
+function initAnalysis() {
+  $('#a-sample').innerHTML = D.samples.map((s, i) => `<option value="${i}">${esc(s.id)} (${ROLE(s.role)} · ${sexText(s)})${s.qc && s.qc.length ? ' ⚠' : ''}</option>`).join('');
+  $('#a-sample').value = current.s;
+  $('#a-sample').onchange = () => { current.s = +$('#a-sample').value; go('analysis'); };
+  $('#a-locus').onchange = () => { current.l = +$('#a-locus').value; go('analysis'); };
+  $('#a-prev').onclick = () => step(-1); $('#a-next').onclick = () => step(1);
+  $('#a-flag').onchange = renderAnalysis;
+}
+function locusOrder(si) {
+  const S = D.samples[si];
+  const idx = D.loci.map((_, i) => i);
+  const rank = i => { const r = R[si + ':' + i]; return (S.expected.includes(i) ? 0 : 1) * 10 + ({high:0,watch:1,info:2,ok:3}[r ? r.level : 'ok']); };
+  return idx.sort((a, b) => rank(a) - rank(b) || a - b);
+}
+function step(d) {
+  let order = locusOrder(current.s);
+  if ($('#a-flag').checked) order = order.filter(i => { const r = R[current.s + ':' + i]; return r && (r.level !== 'ok' || r.expected); });
+  if (!order.length) return;
+  let k = order.indexOf(current.l); k = (k + d + order.length) % order.length; current.l = order[k]; go('analysis');
+}
+function helpBtn(id) { return `<span class="help" onclick="document.getElementById('${id}').classList.toggle('on')">?</span>`; }
+
+function renderAnalysis() {
+  const si = current.s, li = current.l, S = D.samples[si], L = D.loci[li], r = R[si + ':' + li];
+  $('#a-sample').value = si;
+  const order = locusOrder(si);
+  $('#a-locus').innerHTML = order.map(i => { const x = R[si + ':' + i]; const tag = S.expected.includes(i) ? ' ★' : (x && x.level !== 'ok' ? ' •' : '');
+    return `<option value="${i}">${esc(D.loci[i].gene)} · ${esc(D.loci[i].disease_id || D.loci[i].id)}${tag}</option>`; }).join('');
+  $('#a-locus').value = li;
+  if (!r) { $('#a-body').innerHTML = `<div class="card empty">${t('결과 없음', 'No result')}</div>`; return; }
+  const u = L.unit;
+  const links = [
+    `<a href="https://strchive.org/loci/${encodeURIComponent(L.id)}" target="_blank" rel="noopener">STRchive</a>`,
+    L.stripy ? `<a href="https://stripy.org/database/${encodeURIComponent(L.stripy.split(',')[0])}" target="_blank" rel="noopener">STRipy</a>` : '',
+    L.gnomad ? `<a href="https://gnomad.broadinstitute.org/short-tandem-repeat/${encodeURIComponent(L.gnomad.split(',')[0])}?dataset=gnomad_r4" target="_blank" rel="noopener">gnomAD</a>` : '',
+    L.omim ? `<a href="https://omim.org/entry/${encodeURIComponent(L.omim.split(',')[0])}" target="_blank" rel="noopener">OMIM</a>` : '',
+    L.genereviews ? `<a href="https://www.ncbi.nlm.nih.gov/books/${encodeURIComponent(L.genereviews.split(',')[0])}/" target="_blank" rel="noopener">GeneReviews</a>` : ''
+  ].filter(Boolean).join('');
+  const a = r.alleles;
+  const clusters = a.clusters.length ? a.clusters.map((c, k) => {
+    const hp = c.hp1 || c.hp2 ? `HP1 ${c.hp1} · HP2 ${c.hp2}` : t('HP 없음', 'no HP');
+    const len = c.spread ? `${c.min_bp}–${c.max_bp}` : `${c.median_bp}`;
+    const units = c.spread ? `${fmt(c.min_units,0)}–${fmt(c.max_units,0)}` : fmt(c.units, 0);
+    return `<tr><td>allele ${k + 1}</td><td class="num">${len} bp</td><td class="num">${units}${U}</td><td class="rg-${c.class}">${RANGE(c.class)}</td><td class="num">${c.n}</td><td>${hp}</td><td>${esc(c.motif)}</td><td class="note">${c.spread ? t('크기 퍼짐 큼 (체세포 변이 또는 측정 오차)', 'wide size spread (somatic variation or measurement error)') : ''}</td></tr>`;
+  }).join('') : `<tr><td colspan="8" class="empty">${t('양쪽 flank를 다 지나는 HiFi read가 없습니다.', 'No HiFi read spans both flanks.')}</td></tr>`;
+  const extra = [];
+  if (a.hifi_lb_max) extra.push(t(`HiFi 하한 최대 ${a.hifi_lb_max} bp (${fmt(uOf(L, a.hifi_lb_max), 0)}회 이상) — read가 반복 안에서 끝남`, `HiFi lower bound up to ${a.hifi_lb_max} bp (≥ ${fmt(uOf(L, a.hifi_lb_max), 0)} units) — reads end inside the repeat`));
+  if (a.fail_expanded) extra.push(t(`정렬본 밖 read(fail·unassigned) 확장 ${a.fail_expanded}개 (최대 ${a.fail_expanded_max_bp} bp)`, `expanded reads outside the aligned BAM (fail/unassigned): ${a.fail_expanded} (max ${a.fail_expanded_max_bp} bp)`));
+  if (r.x_ratio !== null && r.x_ratio !== undefined) extra.push(t(`X/상염색체 depth 비 ${fmt(r.x_ratio)} (${r.x_ratio < 0.7 ? 'X 1개' : r.x_ratio >= 0.8 ? 'X 2개' : '애매'}) · manifest 성별 ${S.sex ? SEX(S.sex) : '없음'}`, `X/autosome depth ratio ${fmt(r.x_ratio)} (${r.x_ratio < 0.7 ? 'one X' : r.x_ratio >= 0.8 ? 'two X' : 'unclear'}) · manifest sex ${S.sex ? SEX(S.sex) : 'not given'}`));
+
+  $('#a-body').innerHTML = `
+  <div class="lochead"><span class="title">${esc(L.gene)}</span><span>${esc(L.disease)}</span>${r.expected ? `<span class="exp-tag" title="${esc(EXP_TITLE())}">${t('기존 진단 좌위', 'Known diagnosis')}</span>${reproduced(r) ? '' : `<span class="qc" style="margin-left:6px">${t('이 데이터에서 재현 안 됨', 'not reproduced in this data')}</span>`}` : ''} ${lv(r.level)}</div>
+  <div class="card"><dl class="kv">
+    <dt>${t('샘플', 'Sample')}</dt><dd>${esc(S.id)} · ${roleTag(S)}${S.group !== ROLE(S.role) ? esc(S.group) + ' · ' : ''}${sexText(S)}${S.note ? ' · ' + esc(S.note) : ''}${qcList(S).map(q => `<div class="qc">⚠ ${esc(q)}</div>`).join('')}</dd>
+    <dt>${t('좌위', 'Locus')}</dt><dd>${[L.id, L.region, L.location, L.inheritance ? t('유전 ', 'inheritance ') + L.inheritance : '', L.evidence ? t('근거 ', 'evidence ') + L.evidence : ''].filter(Boolean).map(esc).join(' · ')}</dd>
+    <dt>${t('반복 단위', 'Motifs')}</dt><dd>${esc(L.motifs.join(', '))}${L.path_motifs.length ? t(' · 병적 motif ', ' · pathogenic motif ') + esc(L.path_motifs.join(', ')) : ''}</dd>
+    <dt>${t('기준', 'Thresholds')} (${esc(L.source)})</dt><dd>${t('정상', 'normal')} ≤ ${fmt(L.normal_max,0)}${U} (${Math.round(L.normal_max * u + (L.offset || 0))} bp) · ${t('병적', 'pathogenic')} ≥ ${fmt(L.path_min,0)}${U} (${Math.round(L.path_min * u + (L.offset || 0))} bp)${L.known ? '' : ` · <b>${t('출처에 기준 일부 없음 (추정값)', 'partly missing in the source (estimated)')}</b>`}${tx(L.count_note) ? `<div class="note">${t('반복 수 보정: ', 'Count correction: ')}${esc(tx(L.count_note))}</div>` : ''}</dd>
+    <dt>${t('참고 자료', 'References')}</dt><dd class="links">${links}</dd>
+    ${r.hints.length ? `<dt>${t('판정 근거', 'Reasons')}</dt><dd><ul class="hints">${r.hints.map(h => `<li>${esc(tx(h))}</li>`).join('')}</ul></dd>` : ''}
+    ${r.error ? `<dt>${t('오류', 'Error')}</dt><dd>${esc(r.error)}</dd>` : ''}
+  </dl></div>
+  <div class="card"><h3>${t('HiFi allele 요약', 'HiFi alleles')} ${helpBtn('h-al')}</h3>
+    <div class="helpbox" id="h-al">${t("양쪽 flank를 다 지나는 HiFi read의 반복 길이를 모아 최대 두 묶음(allele)으로 나눈 것입니다. 길이는 STRchive 구간 기준이라 TRGT의 AL 값과 같은 기준입니다. 범위 분류는 위 '기준'의 정상/병적 경계로 정합니다. 병적 motif가 정해진 좌위(예: RFC1)는 motif가 다르면 길어도 '양성 motif'로 표시합니다.", "Repeat lengths of HiFi reads that span both flanks, split into at most two groups (alleles). Lengths use the STRchive region, the same basis as TRGT's AL. The range comes from the normal/pathogenic thresholds above. At loci with a defined pathogenic motif (e.g. RFC1), a long allele with another motif is shown as 'benign motif'.")}</div>
+    <table><thead><tr><th></th><th class="num">${t('길이', 'Length')}</th><th class="num">${t('반복', 'Units')}</th><th>${t('범위', 'Range')}</th><th class="num">read</th><th>haplotype</th><th>motif</th><th></th></tr></thead><tbody>${clusters}</tbody></table>
+    ${extra.length ? `<p class="note">${extra.map(esc).join('<br>')}</p>` : ''}
+  </div>
+  <div class="card"><h3>${t('read별 반복 길이', 'Repeat length per read')} ${helpBtn('h-strip')}</h3>
+    <div class="helpbox" id="h-strip">${t("점 하나가 read 하나입니다. 가로축은 반복 길이(로그 눈금), 세로 줄은 read가 나온 곳입니다. 배경색은 정상(초록)·중간(노랑)·병적(빨강) 범위입니다.<br>● 양쪽 flank가 다 있어 길이를 정확히 잰 read · ◯ 한쪽 flank만 있고 반복 끝이 보여 추정한 길이 · ▶ read가 반복 안에서 끝나 '이 길이 이상'만 알 수 있는 read · × 반복이 아닌 긴 삽입(분석에서 제외). 점에 마우스를 올리면 read 정보가 보입니다.", "One dot per read. The x axis is repeat length (log scale); rows are where the read came from. Background: normal (green), intermediate (yellow), pathogenic (red).<br>● both flanks present, exact length · ◯ one flank and the repeat end seen, estimated length · ▶ the read ends inside the repeat, so only 'at least this long' is known · × long non-repeat insert (excluded). Hover a dot for read details.")}</div>
+    <div class="legend"><span><b style="background:var(--s1)"></b>HP1</span><span><b style="background:var(--s2)"></b>HP2</span><span><b style="background:var(--muted)"></b>${t('HP 없음 (fail read 포함)', 'no HP (incl. fail reads)')}</span></div>
+    <div id="strip"></div></div>
+  <div class="card"><h3>${t('반복 주변 HiFi depth', 'HiFi depth around the repeat')} ${helpBtn('h-depth')}</h3>
+    <div class="helpbox" id="h-depth">${t(`반복이 든 DNA 분자가 HiFi에서 실패하면 그 read는 양옆 flank까지 통째로 사라지므로, 반복을 중심으로 read 길이만큼 넓게 depth가 꺼집니다.<br>
+      검은 선 = 실제 depth (멀리 떨어진 구간 대비) · 파랑/주황 = HP1/HP2 (반복을 덮는 phase block 안에서만) · 회색 점선 = <b>비교 기준선</b>: 이 샘플의 read 길이로 계산한 '한 allele의 분자가 모두 빠졌다면'(긴 점선) / '두 allele 모두 빠졌다면'(짧은 점선) 보였을 모양.<br>
+      f = 실제 함몰을 기준선 모양에 맞춘 빠진 비율 (0 = 함몰 없음, 0.5 = 한 allele 전부, 1 = 두 allele 전부). ± = read를 다시 뽑아 계산한 표준오차. 30x에서 f의 표준오차가 0.15–0.25라 혼자 판정하지 말고 같은 좌위의 다른 샘플과 비교하세요.`, `When a molecule carrying the repeat fails to become HiFi, the whole read disappears, flanks included, so depth drops over a read length around the repeat.<br>
+      Black = observed depth (relative to distant bins) · blue/orange = HP1/HP2 (only inside the phase block covering the repeat) · grey dashed = <b>reference shapes</b> from this sample's read lengths: 'all molecules of one allele lost' (long dashes) / 'both alleles lost' (short dashes).<br>
+      f = lost fraction fitted to that shape (0 = none, 0.5 = one allele, 1 = both). ± = bootstrap standard error over reads. At 30x the SE of f is 0.15–0.25, so compare with other samples at the same locus.`)}</div>
+    <div class="legend"><span><i style="border-color:var(--ink)"></i>${t('전체', 'total')}</span><span><i style="border-color:var(--s1)"></i>HP1</span><span><i style="border-color:var(--s2)"></i>HP2</span><span><i class="d" style="border-color:var(--muted)"></i>${t('기준선: 한 allele 분자 모두 빠짐', 'reference: one allele lost')}</span><span><i class="o" style="border-color:var(--muted)"></i>${t('기준선: 두 allele 모두 빠짐', 'reference: both alleles lost')}</span></div>
+    <div id="depth"></div>
+    <p class="note" id="depth-note"></p></div>
+  <div class="card"><h3>${t('read 행방', 'Where the reads went')} ${helpBtn('h-where')}</h3>
+    <div class="helpbox" id="h-where">${t(`이 좌위 flank(±3 kb)에 놓인 read를 출처와 상태별로 셉니다. '이웃 평균'은 같은 염색체 ±100–160 kb의 대조 지점 ${r.n_ctl}곳을 같은 방식으로 센 평균입니다. 확장 분자가 HiFi에서 fail로 옮겨 가면 fail 쪽 '이웃 대비'가 커지고 HiFi 쪽은 작아집니다.`, `Reads placed on this locus' flanks (±3 kb), by source and state. 'Neighbour mean' is the mean over ${r.n_ctl} control points ±100–160 kb on the same chromosome, counted the same way. When expanded molecules move from HiFi to fail, 'vs neighbours' rises on the fail side and falls on the HiFi side.`)}</div>
+    <div id="where"></div></div>
+  <div class="card"><details><summary>${t('확장·중간·비반복 read 목록', 'Expanded, intermediate and non-repeat reads')}</summary><div id="readlist"></div></details></div>`;
+  drawStrip(r, L); drawDepth(r); drawWhere(r); drawReadList(r, L);
+}
+
+// ---------------------------------------------------------------- charts
+const tip = $('#tip');
+function showTip(e, html) { tip.innerHTML = html; tip.style.display = 'block';
+  const w = tip.offsetWidth, h = tip.offsetHeight; let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + w > innerWidth - 8) x = e.clientX - w - 14; if (y + h > innerHeight - 8) y = e.clientY - h - 14;
+  tip.style.left = x + 'px'; tip.style.top = y + 'px'; }
+function hideTip() { tip.style.display = 'none'; }
+
+function drawStrip(r, L) {
+  const host = $('#strip'); const W = Math.max(480, host.clientWidth), rowH = 34, ml = 170, mr = 18, mt = 22, mb = 28;
+  const groups = GROUPS;
+  const pts = r.reads.filter(p => p[2] !== null && p[1] !== 'AMBIGUOUS');
+  const u = L.unit, nb = L.normal_max * u + (L.offset || 0), pb = L.path_min * u + (L.offset || 0);
+  const maxbp = Math.max(...pts.map(p => p[2]), pb * 1.6, 300);
+  const lo = Math.log10(5), hi = Math.log10(maxbp * 1.3), H = mt + mb + rowH * groups.length;
+  const X = bp => ml + (Math.log10(Math.max(bp, 5)) - lo) / (hi - lo) * (W - ml - mr);
+  let s = `<svg width="${W}" height="${H}" role="img" aria-label="${t('read별 반복 길이', 'repeat length per read')}">`;
+  const zone = (a, b, fill, lab) => { const x1 = X(Math.max(a, 5)), x2 = X(Math.min(b, maxbp * 1.3)); if (x2 > x1) s += `<rect x="${x1}" y="${mt}" width="${x2 - x1}" height="${H - mt - mb}" fill="${fill}"/><text x="${x1 + 4}" y="${mt - 6}">${lab}</text>`; };
+  zone(5, nb, 'var(--zone-n)', t('정상', 'normal')); zone(nb, pb, 'var(--zone-i)', t('중간', 'intermediate')); zone(pb, maxbp * 1.3, 'var(--zone-p)', t('병적', 'pathogenic'));
+  groups.forEach((g, i) => { const y = mt + rowH * i + rowH / 2;
+    s += `<line x1="${ml}" x2="${W - mr}" y1="${y}" y2="${y}" stroke="var(--grid)"/><text x="${ml - 8}" y="${y + 4}" text-anchor="end">${SRC(g)}</text>`; });
+  for (let v = 10; v <= maxbp * 1.3; v *= 10) s += `<text x="${X(v)}" y="${H - 8}" text-anchor="middle">${v >= 1000 ? v / 1000 + ' kb' : v + ' bp'}</text>`;
+  pts.forEach((p, k) => {
+    const gi = groups.indexOf(srcGroup(p[0])); if (gi < 0) return;
+    const y = mt + rowH * gi + rowH / 2 + (((k * 7919) % 17) - 8) * 0.9, x = X(p[2]);
+    const col = p[4] === 1 ? 'var(--s1)' : p[4] === 2 ? 'var(--s2)' : 'var(--muted)';
+    const attrs = `data-k="${k}" class="pt"`;
+    if (p[7] === 'NONREPEAT') s += `<path ${attrs} d="M${x - 4},${y - 4}L${x + 4},${y + 4}M${x - 4},${y + 4}L${x + 4},${y - 4}" stroke="${col}" stroke-width="1.6"/>`;
+    else if (p[3] === 'lower_bound') s += `<path ${attrs} d="M${x - 4},${y - 5}L${x + 5},${y}L${x - 4},${y + 5}Z" fill="${col}"/>`;
+    else if (p[3] === 'estimate') s += `<circle ${attrs} cx="${x}" cy="${y}" r="4" fill="var(--surface)" stroke="${col}" stroke-width="1.6"/>`;
+    else s += `<circle ${attrs} cx="${x}" cy="${y}" r="4" fill="${col}" stroke="var(--surface)" stroke-width="1"/>`;
+  });
+  s += '</svg>';
+  host.innerHTML = s;
+  host.querySelectorAll('.pt').forEach(el => {
+    el.style.cursor = 'pointer';
+    el.onmousemove = e => { const p = pts[+el.dataset.k];
+      showTip(e, `<b>${SRC(srcGroup(p[0]))}</b> · ${STATE(p[7])}<br>${t('반복', 'repeat')} ${p[2]} bp (${fmt(uOf(L, p[2]), 1)}${t('회', ' units')}, ${BOUND(p[3])})<br>HP ${p[4] ?? t('없음', 'none')} · motif ${esc(p[6])} · ${t('순도', 'purity')} ${p[5]}%<br>${t('read 길이', 'read length')} ${p[9]} bp${p[8] ? '<br><span class="note">' + esc(p[8]) + '</span>' : ''}`); };
+    el.onmouseleave = hideTip;
+  });
+}
+
+function drawDepth(r) {
+  const host = $('#depth'), c = r.canyon;
+  if (!c) { host.innerHTML = `<div class="empty">${t('depth 정보 없음', 'no depth data')}</div>`; $('#depth-note').textContent = ''; return; }
+  const W = Math.max(480, host.clientWidth), H = 280, ml = 44, mr = 16, mt = 10, mb = 30;
+  const n = c.tot.length, xs = c.tot.map((_, i) => c.x0 + i * c.step), xmin = xs[0], xmax = xs[n - 1], ymax = 2;
+  const X = v => ml + (v - xmin) / (xmax - xmin) * (W - ml - mr), Y = v => mt + (H - mt - mb) * (1 - Math.min(Math.max(v, 0), ymax) / ymax);
+  const path = arr => { let d = '', pen = false; arr.forEach((v, i) => { if (v === null || v === undefined) { pen = false; return; } d += (pen ? 'L' : 'M') + X(xs[i]).toFixed(1) + ',' + Y(v).toFixed(1) + ' '; pen = true; }); return d; };
+  let s = `<svg width="${W}" height="${H}" role="img" aria-label="${t('반복 주변 depth', 'depth around the repeat')}">`;
+  [0, 0.5, 1, 1.5, 2].forEach(v => s += `<line x1="${ml}" x2="${W - mr}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${ml - 6}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`);
+  const span = (xmax - xmin) / 2000; [-1, -0.5, 0, 0.5, 1].forEach(q => { const v = q * span * 1000; s += `<text x="${X(v)}" y="${H - 8}" text-anchor="middle">${Math.round(v / 1000)} kb</text>`; });
+  s += `<line x1="${X(0)}" x2="${X(0)}" y1="${mt}" y2="${H - mb}" stroke="var(--axis)"/>`;
+  s += `<path d="${path(c.g.map(g => 1 - 0.5 * g))}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="6 4"/>`;
+  s += `<path d="${path(c.g.map(g => 1 - g))}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="2 3"/>`;
+  s += `<path d="${path(c.h1)}" fill="none" stroke="var(--s1)" stroke-width="1.5" opacity=".85"/>`;
+  s += `<path d="${path(c.h2)}" fill="none" stroke="var(--s2)" stroke-width="1.5" opacity=".85"/>`;
+  s += `<path d="${path(c.tot)}" fill="none" stroke="var(--ink)" stroke-width="2"/>`;
+  s += `<line id="xh" x1="0" x2="0" y1="${mt}" y2="${H - mb}" stroke="var(--axis)" stroke-dasharray="3 3" visibility="hidden"/>`;
+  s += `<rect id="ov" x="${ml}" y="${mt}" width="${W - ml - mr}" height="${H - mt - mb}" fill="transparent"/></svg>`;
+  host.innerHTML = s;
+  const ov = host.querySelector('#ov'), xh = host.querySelector('#xh');
+  ov.onmousemove = e => { const rect = ov.getBoundingClientRect(); const px = e.clientX - rect.left + ml;
+    const v = xmin + (px - ml) / (W - ml - mr) * (xmax - xmin); const i = Math.max(0, Math.min(n - 1, Math.round((v - xmin) / c.step)));
+    xh.setAttribute('x1', X(xs[i])); xh.setAttribute('x2', X(xs[i])); xh.setAttribute('visibility', 'visible');
+    showTip(e, `<b>${(xs[i] / 1000).toFixed(1)} kb</b> ${t('(반복 경계 기준)', '(from the repeat)')}<br>${t('전체', 'total')} ${fmt(c.tot[i])} · HP1 ${fmt(c.h1[i])} · HP2 ${fmt(c.h2[i])}<br><span class="note">${t('기준선: 한 allele', 'reference: one allele')} ${fmt(1 - 0.5 * c.g[i])} · ${t('두 allele', 'both alleles')} ${fmt(1 - c.g[i])}</span>`); };
+  ov.onmouseleave = () => { xh.setAttribute('visibility', 'hidden'); hideTip(); };
+  const pm = (f, se) => f === null || f === undefined ? 'NA' : `${fmt(f)} ± ${fmt(se)}`;
+  $('#depth-note').innerHTML = `f ${t('전체', 'total')} <b>${pm(c.f, c.se)}</b> · f HP1 ${pm(c.f1, c.se1)} · f HP2 ${pm(c.f2, c.se2)} · ${t('기준 depth', 'baseline depth')} ${fmt(c.base, 1)}x · ${t('중심/기준', 'centre/baseline')} ${fmt(c.centre_rel)} · phased ${Math.round(c.phased * 100)}% · read N50 ${c.n50.toLocaleString()} bp`;
+}
+
+function drawWhere(r) {
+  const groups = GROUPS;
+  const cols = ['NORMAL', 'INTERMEDIATE', 'EXPANDED', 'EXPANDED_LB', 'BENIGN_MOTIF', 'NONREPEAT', 'UNRESOLVED', 'FLANK_ONLY'];
+  const rows = groups.map(g => { const m = r.counts[g] || {}; const touch = Object.entries(m).filter(([k]) => k !== 'AMBIGUOUS').reduce((a, [, v]) => a + v, 0);
+    const ctl = r.ctl[g]; if (!touch && !(ctl > 0)) return '';
+    const n = k => k === 'INTERMEDIATE' ? (m.INTERMEDIATE || 0) + (m.INTERMEDIATE_LB || 0) : (m[k] || 0);
+    return `<tr><td>${SRC(g)}</td>${cols.map(k => `<td class="num">${n(k) || ''}</td>`).join('')}<td class="num"><b>${touch}</b></td><td class="num">${fmt(ctl, 1)}</td><td class="num">${ctl > 0 ? fmt(touch / ctl) : 'NA'}</td></tr>`; }).join('');
+  $('#where').innerHTML = `<table><thead><tr><th>${t('출처', 'Source')}</th>${cols.map(k => `<th class="num">${STATE(k)}</th>`).join('')}<th class="num">${t('합계', 'Total')}</th><th class="num">${t('이웃 평균', 'Neighbour mean')}</th><th class="num">${t('이웃 대비', 'vs neighbours')}</th></tr></thead><tbody>${rows || `<tr><td colspan="12" class="empty">${t('read 없음', 'no reads')}</td></tr>`}</tbody></table>`;
+}
+
+function drawReadList(r, L) {
+  const pts = r.reads.filter(p => !['NORMAL', 'FLANK_ONLY', 'AMBIGUOUS'].includes(p[7]));
+  $('#readlist').innerHTML = pts.length ? `<table><thead><tr><th>${t('출처', 'Source')}</th><th>${t('상태', 'State')}</th><th class="num">${t('반복 bp', 'Repeat bp')}</th><th class="num">${t('회', 'Units')}</th><th>${t('경계', 'Bound')}</th><th>HP</th><th>motif</th><th class="num">${t('순도', 'Purity')}</th><th class="num">${t('read 길이', 'Read length')}</th><th>read</th></tr></thead><tbody>${
+    pts.sort((a, b) => (b[2] || 0) - (a[2] || 0)).map(p => `<tr><td>${SRC(srcGroup(p[0]))}</td><td>${STATE(p[7])}</td><td class="num">${p[2]}</td><td class="num">${fmt(uOf(L, p[2]), 0)}</td><td>${BOUND(p[3])}</td><td>${p[4] ?? ''}</td><td>${esc(p[6])}</td><td class="num">${p[5]}%</td><td class="num">${p[9]}</td><td class="note">${esc(p[8])}</td></tr>`).join('')
+  }</tbody></table>` : `<div class="empty">${t('정상 이외의 read가 없습니다.', 'No reads other than normal.')}</div>`;
+}
+
+// ---------------------------------------------------------------- loci tab
+function renderLoci() {
+  const q = $('#l-search').value.trim().toLowerCase();
+  const rows = D.loci.map((L, i) => [L, i]).filter(([L]) => !q || (L.gene + ' ' + L.id + ' ' + L.disease).toLowerCase().includes(q));
+  $('#l-count').textContent = `${rows.length} / ${D.loci.length}`;
+  $('#loci-table tbody').innerHTML = rows.map(([L]) => {
+    const edge = L.ref_edge ? L.ref_edge[0] + L.ref_edge[1] : 0;
+    const note = tx(L.count_note) ? `<div title="${esc(tx(L.count_note))}">${t('반복 수 보정', 'count corrected')} −${L.offset} bp ⓘ</div>`
+      : (edge >= 2 * L.unit ? `<div class="qc" title="${esc(t(`참조 서열에서 구간 가장자리 ${edge} bp가 반복 단위와 맞지 않습니다. 반복 수가 약 ${Math.round(edge / L.unit)}회 많게 나올 수 있습니다.`, `${edge} bp at the edges of the reference region do not match the motif; repeat counts may be about ${Math.round(edge / L.unit)} units too high.`))}">⚠ ${t('구간 가장자리 비반복', 'non-repeat edges')} ${edge} bp</div>` : '');
+    return `<tr>
+    <td>${esc(L.id)}</td><td><b>${esc(L.gene)}</b></td><td>${esc(L.disease)}</td><td>${esc(L.inheritance)}</td><td>${esc(L.evidence)}</td>
+    <td class="note">${esc(L.region)}${note}</td><td>${esc(L.motifs.join(', '))}${L.path_motifs.length ? `<div class="note">${t('병적', 'pathogenic')}: ` + esc(L.path_motifs.join(', ')) + '</div>' : ''}</td>
+    <td class="num">${fmt(L.normal_max, 0)}</td><td class="num">${fmt(L.path_min, 0)}${L.known ? '' : '*'}</td>
+    <td class="num ${Math.min(L.uniq_l, L.uniq_r) < 0.2 ? 'rg-intermediate' : ''}">${Math.round(L.uniq_l * 100)}% / ${Math.round(L.uniq_r * 100)}%</td>
+    <td class="links"><a href="https://strchive.org/loci/${encodeURIComponent(L.id)}" target="_blank" rel="noopener">STRchive</a>${L.stripy ? `<a href="https://stripy.org/database/${encodeURIComponent(L.stripy.split(',')[0])}" target="_blank" rel="noopener">STRipy</a>` : ''}</td></tr>`; }).join('');
+}
+$('#l-search').oninput = renderLoci;
+
+// ---------------------------------------------------------------- run tab
+function copyText(text, el) {
+  const done = () => { el.classList.add('copied'); setTimeout(() => el.classList.remove('copied'), 700); };
+  try {
+    if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(text).then(done, () => legacy()); return; }
+  } catch (e) {}
+  legacy();
+  function legacy() { const ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch (e) {} ta.remove(); }
+}
+function renderRun() {
+  const p = Object.entries(D.meta.params).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('');
+  const fn = p => `<span class="path" title="${esc(p)}" data-path="${esc(p)}">${esc(String(p).split('/').pop())}</span>`;
+  const samples = D.samples.map(s => `<tr><td><b>${esc(s.id)}</b>${qcMark(s)}</td><td>${roleTag(s)}<span class="note">${esc(s.group)}</span></td><td>${s.sex ? SEX(s.sex) : '—'}</td><td>${s.sex_inferred ? SEX(s.sex_inferred) : '—'}<span class="note">${s.x_ratio != null ? ' ' + fmt(s.x_ratio) : ''}</span></td><td>${esc(s.expected_raw || '—')}</td><td class="note">${fn(s.hifi_bam)}</td>
+    <td class="note">${s.fail_bams.map(fn).join('<br>') || '—'}${s.hifi_raw_bams.length ? '<br>hifi_reads: ' + s.hifi_raw_bams.map(fn).join('<br>') : ''}${(s.unassigned_used || []).length ? `<br><span class="note">unassigned (${t('사용', 'used')}):</span><br>` + s.unassigned_used.map(fn).join('<br>') : ''}</td>
+    <td class="note">${[...[...qcList(s), ...(s.note ? [t('메모: ', 'Note: ') + s.note] : []), ...s.notes].map(esc), ...(s.unassigned.length ? [`unassigned (${t('사용 안 함', 'not used')}): ` + s.unassigned.map(fn).join(', ')] : [])].join('<br>') || '—'}</td></tr>`).join('');
+  const bams = D.bams.map(b => `<tr><td>${esc(D.samples[b.sample].id)}</td><td>${esc(b.kind)}</td><td class="note">${fn(b.path)}</td><td class="num">${b.reads.toLocaleString()}</td><td class="num">${fmt(b.gb, 1)}</td><td class="num">${b.prefilter.toLocaleString()}</td><td class="num">${b.placed.toLocaleString()}</td><td class="num">${Math.round(b.seconds)}</td><td class="note">${Object.entries(b.cats).map(([k, v]) => k.replace('fail_', '') + ' ' + v.toLocaleString()).join(' · ')}</td></tr>`).join('');
+  $('#tab-run').innerHTML = `<h1>${t('실행 정보', 'Run')}</h1><p class="sub">tr-rescue v${esc(D.meta.version)} · ${esc(D.meta.created)}</p>
+  <div class="card"><h3>${t('설정', 'Settings')}</h3><dl class="kv"><dt>reference</dt><dd>${esc(D.meta.reference)}</dd><dt>${t('좌위 카탈로그', 'Locus catalog')}</dt><dd>${esc(D.meta.catalog)}</dd>${p}</dl></div>
+  <div class="card"><h3>${t('샘플과 입력 BAM', 'Samples and input BAMs')}</h3><div style="overflow:auto"><table><thead><tr><th>${t('샘플', 'Sample')}</th><th>${t('역할 · group', 'Role · group')}</th><th>${t('성별', 'Sex')}</th><th>${t('chrX 추정', 'chrX inferred')}</th><th>${t('기존 진단', 'Known dx')}</th><th>${t('정렬 BAM', 'Aligned BAM')}</th><th>fail BAM</th><th>${t('메모 · 경고', 'Notes · warnings')}</th></tr></thead><tbody>${samples}</tbody></table></div></div>
+  <div class="card"><h3>${t('BAM 스캔 통계', 'BAM scan statistics')}</h3><div style="overflow:auto"><table><thead><tr><th>${t('샘플', 'Sample')}</th><th>${t('종류', 'Kind')}</th><th>${t('파일', 'File')}</th><th class="num">reads</th><th class="num">Gb</th><th class="num">${t('1차 통과', 'Prefilter')}</th><th class="num">${t('좌위 배치', 'Placed')}</th><th class="num">${t('초', 's')}</th><th>${t('ff 범주별 read', 'Reads by ff category')}</th></tr></thead><tbody>${bams || `<tr><td colspan="9" class="empty">${t('없음', 'none')}</td></tr>`}</tbody></table></div>
+  <p class="note">${t('1차 통과 = 한 좌위의 flank k-mer가 일정 수 이상 들어 있는 read. 좌위 배치 = 실제로 flank에 일관되게 놓인 read. unassigned = barcode를 판별하지 못한 read. 셀에 이 샘플 barcode 하나만 있으면(single-plex) 이 샘플 read로 보고 따로 셉니다. 점선 밑줄 파일 이름: 마우스를 올리면 전체 경로, 누르면 경로 복사.', 'Prefilter = reads carrying enough flank k-mers of one locus. Placed = reads consistently placed on a flank. unassigned = reads whose barcode could not be read; when the cell holds only this sample (single-plex) they are counted separately as this sample\'s reads. Dotted file names: hover for the full path, click to copy it.')}</p></div>`;
+  document.querySelectorAll('#tab-run .path').forEach(e => e.onclick = () => copyText(e.dataset.path, e));
+}
+
+// ---------------------------------------------------------------- overview
+function renderOverview() {
+  const nexp = D.samples.reduce((a, s) => a + s.expected.length, 0);
+  const ko = () => `
+  <p class="sub">PacBio HiFi WGS에서 반복 확장(tandem repeat expansion)을 놓치지 않도록, 좌위마다 <b>HiFi allele 길이</b>, <b>반복 주변 depth</b>, <b>반복을 지나는 read가 어디로 갔는지</b>를 함께 보여 주는 연구용 도구입니다.</p>
+  <div class="card"><h3>왜 필요한가</h3><p class="note">긴 반복(특히 GA·GC가 많은 반복)이 든 DNA 분자는 HiFi(CCS) 생성에 실패해 HiFi BAM에서 빠지고 fail BAM으로 가거나, 아예 어떤 BAM에도 남지 않습니다. 이렇게 되면 TRGT 같은 genotyper가 정상으로 부를 수 있습니다. TR-Rescue는 '있어야 할 read가 사라진 흔적'과 fail read 속 확장 read를 따로 찾아 그런 경우를 드러냅니다.</p></div>
+  <h2>결과 보는 순서</h2>
+  <div class="card"><ol style="margin:0;padding-left:20px">
+    <li><b>요약</b>에서 '확인 필요'·'관찰' 행과 기존 진단 좌위(<span class="exp-tag" style="margin:0">기존 진단</span>: manifest의 locus 열에 적은 값, 도구 판정 아님)를 봅니다. '기존 진단'인데 '이상 없음'이면 이 데이터에서 재현되지 않은 것이니 먼저 확인합니다(상태 패널의 '기존 진단 재현'을 누르면 그 행만 보입니다). 필터로 샘플·좌위를 좁힐 수 있습니다.</li>
+    <li>행을 누르면 <b>분석</b>으로 갑니다. 위에서부터 <b>allele 요약</b> → <b>read별 반복 길이</b> → <b>주변 depth</b> → <b>read 행방</b> 순서로 근거를 확인합니다.</li>
+    <li>질환 정보(표현형, 침투도, 문헌)는 각 좌위의 <b>STRchive · STRipy · gnomAD · OMIM</b> 링크에서 확인합니다.</li>
+  </ol></div>
+  <h2>판정 표시</h2>
+  <div class="card"><dl class="kv">
+    <dt>${lv('high')}</dt><dd>HiFi에서 병적 범위 allele이 있거나, 확장 근거가 정렬본 밖 read(fail·unassigned)에만 5개 이상 있거나, 확장 read 없이 depth가 두 allele 소실 수준으로 함몰된 경우</dd>
+    <dt>${lv('watch')}</dt><dd>중간 범위 allele, fail read 농축(이웃 대비 3배 이상), HiFi read 감소, 의미 있는 depth 함몰</dd>
+    <dt>${lv('info')}</dt><dd>길지만 병적 motif가 아닌 allele(예: RFC1의 AAAAG·AAAGG 확장), 다른 샘플에도 같이 나오는 신호, 약한 depth 함몰</dd>
+    <dt>${lv('ok')}</dt><dd>위에 해당 없음 (모든 좌위는 '이상 없음' 필터를 켜면 볼 수 있음)</dd>
+  </dl><p class="note">판정은 근거를 모아 보여 주는 표시일 뿐 진단이 아닙니다. 확진은 별도 검사로 합니다.</p></div>
+  <h2>용어</h2>
+  <div class="card"><dl>
+    <dt>HiFi (정렬)</dt><dd>정렬 BAM(HiPhase 태그본)의 HiFi read. HP1/HP2는 HiPhase가 붙인 haplotype.</dd>
+    <dt>fail 0x08 subread</dt><dd>CCS를 못 만든 ZMW에서 나온 subread(1회 이상 full pass). 오류가 많지만 반복 길이는 대략 잴 수 있음.</dd>
+    <dt>fail 0x01 (QV&lt;20)</dt><dd>CCS는 만들었지만 정확도가 QV20 미만이라 HiFi에서 빠진 read. GC가 많은 긴 반복(예: FMR1)이 여기로 잘 감.</dd>
+    <dt>unassigned</dt><dd>barcode를 판별하지 못한 read. 셀에 이 샘플 barcode 하나뿐이면(single-plex) 이 샘플 read로 보고 따로 셉니다.</dd>
+    <dt>flank k-mer 배치</dt><dd>reference에서 한 번만 나오는 반복 양옆 3 kb의 21-mer로 read를 좌위에 놓습니다. 정렬이 없는 fail read에도 같은 기준이 적용됩니다. 한쪽에 10개 이상 일관되게 맞아야 배치합니다.</dd>
+    <dt>정확 / 추정 / 하한</dt><dd>양쪽 flank가 다 있으면 정확한 길이, 한쪽만 있고 반복 끝이 보이면 추정, read가 반복 안에서 끝나면 '이 길이 이상'(하한).</dd>
+    <dt>순도</dt><dd>반복 구간에서 반복 단위로 시작하는 위치의 비율. 0.55 미만의 긴 구간은 '비반복 삽입'으로 보고 확장으로 세지 않습니다.</dd>
+    <dt>이웃 대비</dt><dd>같은 염색체 ±100–160 kb 대조 지점 대비 read 수 비율. 1이면 평소와 같음.</dd>
+    <dt>depth f</dt><dd>반복 주변 depth 함몰을, '그 allele 분자가 모두 빠졌다면' 보일 모양에 맞춘 빠진 비율.</dd>
+  </dl></div>
+  <h2>좌위 정보 출처</h2>
+  <div class="card"><p class="note">좌위 좌표(hg38), 반복 단위, 정상·중간·병적 범위, 유전 형태, 근거 수준은 <a href="https://strchive.org" target="_blank" rel="noopener">STRchive</a>(${esc(D.meta.catalog)})를 썼습니다. STRchive는 STRipy, gnomAD, 문헌을 모아 정리한 질환 반복 좌위 자료이고, TRGT용 카탈로그와 좌위 ID가 같아서 이 도구의 길이를 TRGT의 AL 값과 바로 비교할 수 있습니다. STRchive 구간이 임상 반복 수와 다른 AR·FRAXE·ATXN8OS는 반복 수를 보정했습니다('좌위 정보' 탭). 질환별 세부 기준과 표현형은 각 좌위의 STRchive · STRipy · gnomAD · OMIM · GeneReviews 링크에서 확인하세요.</p></div>
+  <h2>입력과 출력</h2>
+  <div class="grid2">
+    <div class="card"><h3>입력</h3><dl class="kv"><dt>manifest</dt><dd>.xlsx · .csv · .tsv 중 아무거나. 열: <code>sample_id</code> <code>group</code> <code>sex</code> <code>locus</code>(기존 진단 좌위) <code>hifi_bam</code> <code>fail_bams</code>(auto 가능) <code>hifi_raw_bams</code>(선택) <code>note</code>(자유 메모)</dd>
+      <dt>group</dt><dd>자유롭게 적어도 됩니다. positive·patient·case·양성·환자 → <span class="role role-positive">양성</span>, control·normal·reference·음성·정상 → <span class="role">대조</span>, 그 밖(sample·test·빈칸) → <span class="role">검사</span>로 읽고, 적은 글자는 그대로 표시합니다.</dd>
+      <dt>sex</dt><dd>M/F (남/여, male/female). 비우면 chrX depth로 추정하고, 적었는데 depth와 다르면 ⚠ 경고를 띄웁니다.</dd>
+      <dt>정렬 BAM</dt><dd>HiPhase 태그본 권장 (.bai 필요)</dd><dt>fail BAM</dt><dd>Revio 원본 <code>fail_reads.*.bam</code>, @RG로 자동 탐색</dd><dt>unassigned</dt><dd><code>hifi_reads/fail_reads.unassigned.bam</code>. single-plex 셀만 사용, 여러 샘플을 섞은 셀은 쓰지 않습니다.</dd><dt>reference</dt><dd>정렬에 쓴 FASTA + .fai</dd></dl></div>
+    <div class="card"><h3>출력</h3><dl class="kv"><dt>report.html</dt><dd>이 화면 (왼쪽 위 KR/EN으로 언어 전환)</dd><dt>summary.tsv</dt><dd>샘플×좌위 한 줄 (allele 요약, 판정, 출처별 read 수)</dd><dt>reads.tsv</dt><dd>read 한 줄 (출처, 길이, 경계, motif, 순도, HP)</dd><dt>depth.tsv</dt><dd>±100 kb 상대 depth와 기준선</dd><dt>bam_stats.tsv · run.json</dt><dd>입력 통계와 실행 기록</dd></dl></div>
+  </div>
+  <h2>한계</h2>
+  <div class="card"><ul class="note" style="margin:0;padding-left:18px">
+    <li>full pass가 0인 분자는 어떤 BAM에도 없어서 depth 함몰로만 보입니다. 30x에서 depth만으로는 한쪽 allele 소실이 경계선입니다.</li>
+    <li>상동 유전자·분절중복 안의 좌위(예: NOTCH2NLC)는 유일 flank k-mer가 적어 read 수가 적게 잡힐 수 있습니다('좌위 정보'의 유일 flank 비율 참고).</li>
+    <li>샘플이 4명 이상이면 같은 좌위의 다른 샘플(그 좌위가 기존 진단이 아닌 샘플)과 비교합니다. 다른 샘플 절반 이상에서 같은 신호가 나오면 좌위 자체의 특성(GC가 많은 구간의 depth 감소, 기준값 문제 등)으로 보고 '참고'로 낮춥니다. depth 함몰도 코호트의 평소 흔들림(이번 실행의 표준편차)을 넘어야 판정에 씁니다. 30x에서 한쪽 allele 소실(f≈0.5)은 이 흔들림 안에 들어가므로 depth만으로는 판정하지 않습니다.</li>
+    <li>depth 중앙값이 5x 미만인 샘플은 '데이터 부족'으로 표시하고 판정하지 않습니다('이상 없음'이 음성을 뜻하지 않음).</li>
+  </ul></div>`;
+  const en = () => `
+  <p class="sub">A research tool that keeps tandem repeat expansions from being missed in PacBio HiFi WGS: for every locus it shows the <b>HiFi allele lengths</b>, the <b>depth around the repeat</b>, and <b>where the reads that cross the repeat went</b>.</p>
+  <div class="card"><h3>Why</h3><p class="note">DNA molecules carrying long repeats (especially GA- or GC-rich ones) often fail to become HiFi (CCS) reads. They drop out of the HiFi BAM into the fail BAM, or leave no read at all, and a genotyper such as TRGT may then call the locus normal. TR-Rescue looks for the traces of reads that should be there and for expanded reads among the fail reads, to expose such cases.</p></div>
+  <h2>How to read the results</h2>
+  <div class="card"><ol style="margin:0;padding-left:20px">
+    <li>In <b>Summary</b>, look at the 'Review' and 'Watch' rows and the known-diagnosis loci (<span class="exp-tag" style="margin:0">Known dx</span>: taken from the manifest's locus column, not a call by this tool). A known diagnosis with 'No finding' was not reproduced in this data — check it first (click 'Known dx reproduced' in the status panel to list those rows). Filters narrow samples and loci.</li>
+    <li>Click a row to open <b>Analysis</b>. Read the evidence top down: <b>alleles</b> → <b>repeat length per read</b> → <b>depth around the repeat</b> → <b>where the reads went</b>.</li>
+    <li>Disease information (phenotype, penetrance, literature) is behind each locus' <b>STRchive · STRipy · gnomAD · OMIM</b> links.</li>
+  </ol></div>
+  <h2>Calls</h2>
+  <div class="card"><dl class="kv">
+    <dt>${lv('high')}</dt><dd>a pathogenic-range allele in HiFi; or expansion evidence only in reads outside the aligned BAM (fail/unassigned), 5 or more; or depth loss at the level of both alleles without expanded reads</dd>
+    <dt>${lv('watch')}</dt><dd>an intermediate-range allele, fail reads enriched (≥3× the neighbours), fewer HiFi reads, or a meaningful depth loss</dd>
+    <dt>${lv('info')}</dt><dd>a long allele without the pathogenic motif (e.g. RFC1 AAAAG/AAAGG), a signal shared with other samples, or a weak depth dip</dd>
+    <dt>${lv('ok')}</dt><dd>none of the above (switch on the 'No finding' filter to see every locus)</dd>
+  </dl><p class="note">Calls gather the evidence; they are not a diagnosis. Confirm with an independent test.</p></div>
+  <h2>Terms</h2>
+  <div class="card"><dl>
+    <dt>HiFi (aligned)</dt><dd>HiFi reads in the aligned BAM (HiPhase-tagged). HP1/HP2 are HiPhase haplotypes.</dd>
+    <dt>fail 0x08 subread</dt><dd>a subread from a ZMW that produced no CCS read (≥1 full pass). Error-prone, but the repeat length can be roughly measured.</dd>
+    <dt>fail 0x01 (QV&lt;20)</dt><dd>a CCS read below QV20, so not HiFi. Long GC-rich repeats (e.g. FMR1) often end up here.</dd>
+    <dt>unassigned</dt><dd>reads whose barcode could not be read. In a single-plex cell they are counted separately as this sample's reads.</dd>
+    <dt>flank k-mer placement</dt><dd>reads are placed with 21-mers from 3 kb on either side of the repeat that occur once in the reference — the same rule for unaligned fail reads. At least 10 consistent hits on one side are required.</dd>
+    <dt>exact / estimate / lower bound</dt><dd>both flanks present: exact length; one flank and the repeat end seen: estimate; the read ends inside the repeat: 'at least this long'.</dd>
+    <dt>purity</dt><dd>the fraction of positions in the repeat that start a motif unit. Long stretches below 0.55 are treated as non-repeat inserts, not expansions.</dd>
+    <dt>vs neighbours</dt><dd>read count relative to control points ±100–160 kb on the same chromosome. 1 means as usual.</dd>
+    <dt>depth f</dt><dd>the depth loss around the repeat, fitted to the shape expected if all molecules of an allele were lost.</dd>
+  </dl></div>
+  <h2>Locus data</h2>
+  <div class="card"><p class="note">Coordinates (hg38), motifs, normal/intermediate/pathogenic ranges, inheritance and evidence come from <a href="https://strchive.org" target="_blank" rel="noopener">STRchive</a> (${esc(D.meta.catalog)}), which compiles STRipy, gnomAD and the literature and shares locus IDs with the TRGT catalog, so lengths here compare directly with TRGT's AL. Repeat counts are corrected at AR, FRAXE and ATXN8OS, where the STRchive region differs from the clinical count (see the Loci tab). Use each locus' STRchive · STRipy · gnomAD · OMIM · GeneReviews links for disease-specific thresholds and phenotypes.</p></div>
+  <h2>Input and output</h2>
+  <div class="grid2">
+    <div class="card"><h3>Input</h3><dl class="kv"><dt>manifest</dt><dd>.xlsx, .csv or .tsv. Columns: <code>sample_id</code> <code>group</code> <code>sex</code> <code>locus</code> (known diagnosis) <code>hifi_bam</code> <code>fail_bams</code> (auto allowed) <code>hifi_raw_bams</code> (optional) <code>note</code> (free text)</dd>
+      <dt>group</dt><dd>free text. positive/patient/case → <span class="role role-positive">positive</span>, control/normal/reference → <span class="role">control</span>, anything else (sample, test, empty) → <span class="role">test</span>; the text itself is shown as written.</dd>
+      <dt>sex</dt><dd>M/F (male/female). If empty it is inferred from chrX depth; if given and the depth disagrees, a ⚠ warning appears.</dd>
+      <dt>aligned BAM</dt><dd>HiPhase-tagged recommended (.bai needed)</dd><dt>fail BAM</dt><dd>Revio <code>fail_reads.*.bam</code>, found automatically from @RG</dd><dt>unassigned</dt><dd><code>hifi_reads/fail_reads.unassigned.bam</code>; used only for single-plex cells, never for multiplexed ones.</dd><dt>reference</dt><dd>the FASTA used for alignment + .fai</dd></dl></div>
+    <div class="card"><h3>Output</h3><dl class="kv"><dt>report.html</dt><dd>this page (switch language with KR/EN at the top left)</dd><dt>summary.tsv</dt><dd>one row per sample × locus (alleles, call, reads per source)</dd><dt>reads.tsv</dt><dd>one row per read (source, length, bound, motif, purity, HP)</dd><dt>depth.tsv</dt><dd>relative depth over ±100 kb with the reference shapes</dd><dt>bam_stats.tsv · run.json</dt><dd>input statistics and run record</dd></dl></div>
+  </div>
+  <h2>Limitations</h2>
+  <div class="card"><ul class="note" style="margin:0;padding-left:18px">
+    <li>Molecules with zero full passes are in no BAM and show only as a depth loss. At 30x, losing one allele is borderline from depth alone.</li>
+    <li>Loci inside paralogous genes or segmental duplications (e.g. NOTCH2NLC) have few unique flank k-mers, so fewer reads may be counted (see the unique-flank column in Loci).</li>
+    <li>With 4 or more samples, each sample is compared with the others at the same locus (excluding samples with a known diagnosis there). A signal present in at least half of the other samples is treated as a property of the locus (GC-related depth dips, threshold issues, …) and lowered to 'Note'. Depth loss must also exceed the cohort's usual spread (its SD in this run). At 30x, loss of one allele (f≈0.5) falls inside that spread, so it is not called from depth alone.</li>
+    <li>Samples with median depth below 5x are flagged 'Insufficient data' and not judged ('No finding' does not mean negative).</li>
+  </ul></div>`;
+  const n = {high:0, watch:0, info:0, ok:0}; D.results.forEach(r => n[r.level]++);
+  const exp = D.results.filter(r => r.expected), found = exp.filter(reproduced).length;
+  const warned = D.samples.filter(s => s.qc && s.qc.length).length;
+  const row = (attrs, label, val) => `<a ${attrs}><span>${label}</span><b>${val}</b></a>`;
+  const hero = `<div class="hero">
+    <img class="banner" alt="TR-Rescue — Tandem Repeat Expansion Analysis with Long-Read Rescue Evidence" src="data:image/webp;base64,__BANNER__">
+    <div class="hero-side">
+      <div class="card"><h3>${t('결과 한눈에', 'At a glance')}</h3><div class="glance">
+        ${row('data-lv="high"', lv('high'), n.high)}${row('data-lv="watch"', lv('watch'), n.watch)}${row('data-lv="info"', lv('info'), n.info)}
+        ${row('data-missed="1"', t('기존 진단 재현', 'Known dx reproduced'), `${found}/${exp.length}`)}
+        ${warned ? row('data-tab="run"', `<span class="qc">⚠ ${t('샘플 경고', 'Sample warnings')}</span>`, warned) : ''}
+      </div><p class="note" style="margin:8px 0 0">${t('누르면 해당 행만 요약에 보입니다.', 'Click to list those rows in Summary.')}</p></div>
+      <div class="card"><h3>${t('이번 실행', 'This run')}</h3><dl class="kv">
+        <dt>${t('샘플', 'Samples')}</dt><dd>${D.samples.length}${t('명', '')} (${t('기존 진단 좌위', 'known-diagnosis loci')} ${nexp})</dd>
+        <dt>${t('좌위', 'Loci')}</dt><dd>${D.loci.length}${D.loci.length >= 80 ? t(' (질환 관련 반복 전체)', ' (all disease-associated repeats)') : t(' (선택한 좌위)', ' (selected loci)')}</dd>
+        <dt>fail BAM</dt><dd>${D.bams.filter(b => b.kind === 'fail_reads').length}</dd>
+        <dt>${t('생성', 'Created')}</dt><dd>${esc(D.meta.created)} · v${esc(D.meta.version)}</dd></dl></div>
+    </div></div>`;
+  const foot = `<h2>${t('저작권 · 인용', 'Copyright · citation')}</h2>
+  <div class="card"><dl class="kv">
+    <dt>TR-Rescue</dt><dd>© 2026 Seung Won Chae. ${t('MIT 라이선스', 'MIT License')} · <a href="https://github.com/CleanCham-lab/TR-Rescue" target="_blank" rel="noopener">github.com/CleanCham-lab/TR-Rescue</a></dd>
+    <dt>${t('좌위 자료', 'Locus data')}</dt><dd>STRchive (Dashnow lab and contributors), CC BY 4.0 — Hiatt L, et al. <i>Genome Medicine</i> 2025. doi:10.1186/s13073-025-01454-4. ${t('필드를 골라 TSV로 바꿨고 값은 그대로이며, AR·FRAXE·ATXN8OS의 반복 수 보정만 더했습니다.', 'Fields were selected and reformatted; values are unchanged except the repeat-count corrections at AR, FRAXE and ATXN8OS.')}</dd>
+    <dt>${t('인용', 'Cite')}</dt><dd>Chae SW. TR-Rescue v${esc(D.meta.version)}: dropout-aware tandem repeat expansion evidence for PacBio HiFi WGS. https://github.com/CleanCham-lab/TR-Rescue</dd>
+  </dl><p class="note" style="margin:8px 0 0">${t('연구용 소프트웨어입니다. 이 보고서는 진단 결과가 아닙니다.', 'Research software. This report is not a diagnosis.')}</p></div>`;
+  $('#tab-overview').innerHTML = hero + (EN() ? en() : ko()) + foot;
+  document.querySelectorAll('#tab-overview .glance a').forEach(e => e.onclick = () => {
+    if (e.dataset.tab) return go(e.dataset.tab);
+    if (e.dataset.missed) { levelSel = new Set(['high','watch','info','ok']); $('#f-expected').checked = true; $('#f-missed').checked = true; }
+    else { levelSel = new Set([e.dataset.lv]); $('#f-expected').checked = false; $('#f-missed').checked = false; }
+    syncChips(); renderSummary(); go('summary'); });
+}
+
+// ---------------------------------------------------------------- logo (5 quick clicks)
+{ let n = 0, last = 0;
+  $('#logo').onclick = () => { const now = Date.now(); n = now - last < 600 ? n + 1 : 1; last = now; if (n >= 5) { n = 0; $('#egg').classList.add('on'); } };
+  $('#egg').onclick = () => $('#egg').classList.remove('on');
+  addEventListener('keydown', e => { if (e.key === 'Escape') $('#egg').classList.remove('on'); }); }
+
+// ---------------------------------------------------------------- init
+{ const first = D.results.find(r => r.expected) || D.results[0]; if (first) current = {s: first.s, l: first.l}; }
+applyStatic(); renderStatus(); initFilters(); renderSummary(); initAnalysis(); renderLoci(); renderRun(); renderOverview();
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if ($('#tab-analysis').classList.contains('on')) renderAnalysis(); }, 150); });
+route();
+</script>
+</body>
+</html>
