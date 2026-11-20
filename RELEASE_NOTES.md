@@ -40,4 +40,4 @@ unzip tr-rescue_v1.0.0_linux_x86_64.zip && cd tr-rescue_v1.0.0
 
 See README.md (Korean) or README.en.md (English), and CHANGELOG.md.
 
-Research software — not a diagnosis. Code: MIT © 2026 Seung Won Chae. Locus catalog: STRchive, CC BY 4.0 (Hiatt et al., Genome Medicine 2025).
+Research software — not a diagnosis. Code: MIT © 2026 Seung Won Chae (Seoul National University Cancer Research Institute; Molecular Diagnostics Laboratory, Department of Laboratory Medicine, Seoul National University Hospital). Locus catalog: STRchive, CC BY 4.0 (Hiatt et al., Genome Medicine 2025).

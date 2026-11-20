@@ -237,6 +237,10 @@ The build needs access to crates.io.
 
 ## Copyright · license · citation
 
-Copyright © 2026 Seung Won Chae. The code is under the MIT License (`LICENSE`). Built-in locus data (`data/strchive_hg38.tsv`): STRchive (Hiatt et al., Genome Medicine 2025; https://strchive.org), CC BY 4.0 — see `NOTICE`.
+Copyright © 2026 Seung Won Chae. The code is under the MIT License (`LICENSE`).
+
+**Affiliation**
+- Seoul National University Cancer Research Institute
+- Molecular Diagnostics Laboratory, Department of Laboratory Medicine, Seoul National University Hospital Built-in locus data (`data/strchive_hg38.tsv`): STRchive (Hiatt et al., Genome Medicine 2025; https://strchive.org), CC BY 4.0 — see `NOTICE`.
 
 Cite: Chae SW. *TR-Rescue: dropout-aware tandem repeat expansion evidence for PacBio HiFi WGS.* https://github.com/CleanCham-lab/TR-Rescue

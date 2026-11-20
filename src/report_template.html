@@ -34,7 +34,7 @@ nav a.on{background:var(--surface);box-shadow:0 0 0 1px var(--grid);font-weight:
 nav a i{font-style:normal;width:18px;text-align:center;color:var(--ink2)}
 .status{background:var(--surface);border:1px solid var(--grid);border-radius:10px;padding:10px 12px}
 .status h4{margin:0 0 6px;font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.3px}
-.st-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:13px}
+.st-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:3px 0;font-size:13px}
 .st-row b{font-variant-numeric:tabular-nums}
 .st-row.click{cursor:pointer;border-radius:6px;margin:0 -6px;padding:3px 6px}.st-row.click:hover{background:rgba(127,127,127,.1)}
 .side-foot{margin-top:auto;font-size:11.5px;color:var(--muted);padding:0 6px}
@@ -131,7 +131,7 @@ code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;backgrou
     <a data-tab="run"><i>⚙</i><span data-t="실행 정보|Run"></span></a>
   </nav>
   <div class="status" id="status"></div>
-  <div class="side-foot">© 2026 Seung Won Chae · MIT<br><span data-t="좌위 정보|Locus data">좌위 정보</span>: STRchive (CC BY 4.0)<br><span data-t="연구용 — 진단 결과 아님|Research use — not a diagnosis"></span></div>
+  <div class="side-foot">© 2026 Seung Won Chae · MIT<br><span data-t="서울대학교 암연구소 · 서울대학교병원 진단검사의학과|SNU Cancer Research Institute · SNUH Laboratory Medicine"></span><br><span data-t="좌위 정보|Locus data">좌위 정보</span>: STRchive (CC BY 4.0)<br><span data-t="연구용 — 진단 결과 아님|Research use — not a diagnosis"></span></div>
 </aside>
 <main>
 <section id="tab-overview" class="ov"></section>
@@ -663,6 +663,7 @@ function renderOverview() {
   const foot = `<h2>${t('저작권 · 인용', 'Copyright · citation')}</h2>
   <div class="card"><dl class="kv">
     <dt>TR-Rescue</dt><dd>© 2026 Seung Won Chae. ${t('MIT 라이선스', 'MIT License')} · <a href="https://github.com/CleanCham-lab/TR-Rescue" target="_blank" rel="noopener">github.com/CleanCham-lab/TR-Rescue</a></dd>
+    <dt>${t('소속', 'Affiliation')}</dt><dd>${t('서울대학교 암연구소<br>서울대학교병원 진단검사의학과 분자진단검사실', 'Seoul National University Cancer Research Institute<br>Molecular Diagnostics Laboratory, Department of Laboratory Medicine, Seoul National University Hospital')}</dd>
     <dt>${t('좌위 자료', 'Locus data')}</dt><dd>STRchive (Dashnow lab and contributors), CC BY 4.0 — Hiatt L, et al. <i>Genome Medicine</i> 2025. doi:10.1186/s13073-025-01454-4. ${t('필드를 골라 TSV로 바꿨고 값은 그대로이며, AR·FRAXE·ATXN8OS의 반복 수 보정만 더했습니다.', 'Fields were selected and reformatted; values are unchanged except the repeat-count corrections at AR, FRAXE and ATXN8OS.')}</dd>
     <dt>${t('인용', 'Cite')}</dt><dd>Chae SW. TR-Rescue v${esc(D.meta.version)}: dropout-aware tandem repeat expansion evidence for PacBio HiFi WGS. https://github.com/CleanCham-lab/TR-Rescue</dd>
   </dl><p class="note" style="margin:8px 0 0">${t('연구용 소프트웨어입니다. 이 보고서는 진단 결과가 아닙니다.', 'Research software. This report is not a diagnosis.')}</p></div>`;

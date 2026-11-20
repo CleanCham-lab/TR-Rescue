@@ -6,7 +6,9 @@ First public release.
   address (`#summary`, `#analysis/<sample>/<locus>` …); the overview fills wide screens (banner with an
   at-a-glance panel: calls, known-diagnosis reproduction, sample warnings, all clickable); text in overview cards
   uses the card width.
-- Copyright, license and citation in the report (sidebar and overview), `--help`, README and source headers.
+- Copyright, affiliation (Seoul National University Cancer Research Institute; Molecular Diagnostics Laboratory, Department of
+  Laboratory Medicine, Seoul National University Hospital), license and citation in the report (sidebar and overview),
+  `--help`, README, NOTICE and source headers.
 - README in Korean and English without site-specific paths.
 
 ## 0.3.0 — 2026-11-19

@@ -1,5 +1,7 @@
 TR-Rescue
 Copyright (c) 2026 Seung Won Chae — MIT License (see LICENSE)
+Seoul National University Cancer Research Institute;
+Molecular Diagnostics Laboratory, Department of Laboratory Medicine, Seoul National University Hospital
 
 This software embeds a snapshot (2026-11-17) of the STRchive disease tandem-repeat locus catalogue
 (data/strchive_hg38.tsv, derived from data/STRchive-loci.json at https://github.com/dashnowlab/STRchive).

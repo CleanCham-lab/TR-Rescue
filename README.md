@@ -4,7 +4,7 @@
 
 **한국어** · [English](README.en.md)
 
-PacBio HiFi WGS에서 기존 TR genotyper(TRGT 등)가 놓칠 수 있는 tandem repeat 확장을 "있어야 할 read가 사라진 흔적"으로 찾는 연구용 도구입니다.
+PacBio HiFi WGS에서 기존 TR genotyper(TRGT 등)가 놓칠 수 있는 tandem repeat 확장을 **"있어야 할 read가 사라진 흔적"**으로 찾는 연구용 도구입니다.
 
 **v1.0은 0단계(`trace`)를 구현합니다.** 질환 관련 반복 좌위 전체(STRchive 82개)에서 샘플마다 ① HiFi allele 길이와 범위(정상/중간/병적), ② 반복 주변 depth 함몰, ③ 반복을 지나는 read가 어디로 갔는지(HiFi / fail 0x01 / fail 0x08 / unassigned / 어디에도 없음)를 함께 보여 줍니다. 
 
@@ -174,6 +174,10 @@ crates.io 접속이 필요합니다(SSL 검사가 있는 기관망에서는 실�
 
 ## 저작권 · 라이선스 · 인용
 
-Copyright © 2026 Seung Won Chae. 코드는 MIT 라이선스(`LICENSE`)입니다. 내장 좌위 자료(`data/strchive_hg38.tsv`): STRchive (Hiatt et al., Genome Medicine 2025; https://strchive.org), CC BY 4.0 — `NOTICE` 참고.
+Copyright © 2026 Seung Won Chae. 코드는 MIT 라이선스(`LICENSE`)입니다.
+
+**소속**
+- 서울대학교 암연구소 (Seoul National University Cancer Research Institute)
+- 서울대학교병원 진단검사의학과 분자진단검사실 (Molecular Diagnostics Laboratory, Department of Laboratory Medicine, Seoul National University Hospital) 내장 좌위 자료(`data/strchive_hg38.tsv`): STRchive (Hiatt et al., Genome Medicine 2025; https://strchive.org), CC BY 4.0 — `NOTICE` 참고.
 
 인용: Chae SW. *TR-Rescue: dropout-aware tandem repeat expansion evidence for PacBio HiFi WGS.* https://github.com/CleanCham-lab/TR-Rescue

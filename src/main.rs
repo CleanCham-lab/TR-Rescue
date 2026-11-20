@@ -45,7 +45,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
     name = "tr-rescue",
     version,
     about = "Dropout-aware tandem repeat expansion evidence for PacBio HiFi WGS",
-    after_help = "Copyright (c) 2026 Seung Won Chae · MIT License · https://github.com/CleanCham-lab/TR-Rescue\nLocus catalog: STRchive (CC BY 4.0, Hiatt et al. Genome Medicine 2025). Research use only — not a diagnosis."
+    after_help = "Copyright (c) 2026 Seung Won Chae · MIT License · https://github.com/CleanCham-lab/TR-Rescue\nSeoul National University Cancer Research Institute; Molecular Diagnostics Laboratory, Department of Laboratory Medicine, Seoul National University Hospital\nLocus catalog: STRchive (CC BY 4.0, Hiatt et al. Genome Medicine 2025). Research use only — not a diagnosis."
 )]
 struct Cli {
     #[command(subcommand)]
