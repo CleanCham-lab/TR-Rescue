@@ -4,7 +4,7 @@
 
 **한국어** · [English](README.en.md)
 
-PacBio HiFi WGS에서 기존 TR genotyper(TRGT 등)가 놓칠 수 있는 tandem repeat 확장을 **"있어야 할 read가 사라진 흔적"**으로 찾는 연구용 도구입니다.
+PacBio HiFi WGS에서 기존 TR genotyper(TRGT 등)가 놓칠 수 있는 tandem repeat 확장을 "있어야 할 read가 사라진 흔적"으로 찾는 연구용 도구입니다.
 
 **v1.0은 0단계(`trace`)를 구현합니다.** 질환 관련 반복 좌위 전체(STRchive 82개)에서 샘플마다 ① HiFi allele 길이와 범위(정상/중간/병적), ② 반복 주변 depth 함몰, ③ 반복을 지나는 read가 어디로 갔는지(HiFi / fail 0x01 / fail 0x08 / unassigned / 어디에도 없음)를 함께 보여 줍니다. 
 
